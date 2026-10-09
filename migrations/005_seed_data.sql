@@ -3,8 +3,8 @@
 --
 -- Hash bcrypt sudah di-generate via genhash/main.go (terpisah dari project).
 -- Hash yang dipakai:
---   admin123 -> $2a$10$wNOMU5.hOd0qu1SFtVwNCORDb1Rbl39DaX4h.7AY1Mf.ff6bVrxku
---   pass123  -> $2a$10$KjsiSv/GysgEeBprWejZ/OeuskJ7OfJy3cqm76eTB.WZsAPTn3.ZS
+--   admin123      -> $2a$10$vaEDCPpe54zAQBQIZwK2cOKDPyhAq42vU35ocjNpZJktlK8FTucKW
+--   mahasiswa123  -> $2a$10$ly3QSGwGjq77U2Op/n/3sOEJOgzAb38xQKxIRANHTkhPXO6INwnVa
 
 BEGIN;
 
@@ -13,7 +13,7 @@ BEGIN;
 -- ============================================================
 -- email: admin@siakad.test  |  password: admin123
 INSERT INTO users (email, password_hash, role)
-VALUES ('admin@siakad.test', '$2a$10$wNOMU5.hOd0qu1SFtVwNCORDb1Rbl39DaX4h.7AY1Mf.ff6bVrxku', 'admin')
+VALUES ('admin@siakad.test', '$2a$10$vaEDCPpe54zAQBQIZwK2cOKDPyhAq42vU35ocjNpZJktlK8FTucKW', 'admin')
 ON CONFLICT (email) DO NOTHING;
 
 -- ============================================================
@@ -37,7 +37,7 @@ ON CONFLICT (kode_mk) DO NOTHING;
 -- ============================================================
 -- Loop generate 20 mahasiswa:
 --   - email: <nim>@siakad.test
---   - password awal semua sama: pass123
+--   - password awal semua sama: mahasiswa123
 --   - nim: 2024XXXXXXXX (12 digit)
 --   - prodi: Teknik Informatika (ganjil) atau Sistem Informasi (genap)
 --   - angkatan: 2024
@@ -51,7 +51,7 @@ DECLARE
     v_email TEXT;
     v_prodi TEXT;
     v_ipk NUMERIC(3,2);
-    v_hash TEXT := '$2a$10$KjsiSv/GysgEeBprWejZ/OeuskJ7OfJy3cqm76eTB.WZsAPTn3.ZS';
+    v_hash TEXT := '$2a$10$ly3QSGwGjq77U2Op/n/3sOEJOgzAb38xQKxIRANHTkhPXO6INwnVa';
 BEGIN
     FOR i IN 1..20 LOOP
         v_nim   := '2024' || LPAD(i::TEXT, 8, '0');
