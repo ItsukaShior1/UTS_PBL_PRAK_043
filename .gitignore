@@ -10,6 +10,14 @@ api-siakad
 # Generator bcrypt (sandbox, jangan ikut repo utama)
 genhash/
 
+# Panduan markdown lokal (ada di luar repo, jangan sampai ikut)
+PANDUAN-UTS.md
+*.md
+!README.md
+
+# Scripts & laporan lokal (PDF laporan, generator, dll)
+scripts/
+
 # Env
 .env
 .env.local

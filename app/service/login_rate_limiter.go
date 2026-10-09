@@ -9,8 +9,9 @@ type LoginRateLimiter struct {
 	maxFails   int
 	lockoutDur time.Duration
 
-	mu    sync.Mutex
-	fails map[string]*failRecord
+	mu     sync.Mutex
+	fails  map[string]*failRecord
+	ticker *time.Ticker
 }
 
 type failRecord struct {
@@ -65,10 +66,9 @@ func (l *LoginRateLimiter) RegisterSuccess(key string) {
 }
 
 func (l *LoginRateLimiter) Start(interval time.Duration) {
+	l.ticker = time.NewTicker(interval)
 	go func() {
-		t := time.NewTicker(interval)
-		defer t.Stop()
-		for range t.C {
+		for range l.ticker.C {
 			l.mu.Lock()
 			now := time.Now()
 			for k, r := range l.fails {
@@ -79,4 +79,10 @@ func (l *LoginRateLimiter) Start(interval time.Duration) {
 			l.mu.Unlock()
 		}
 	}()
+}
+
+func (l *LoginRateLimiter) Stop() {
+	if l.ticker != nil {
+		l.ticker.Stop()
+	}
 }

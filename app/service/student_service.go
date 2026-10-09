@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 
-	"api-siakad/app/middleware"
+	"api-siakad/middleware"
 	"api-siakad/app/model"
 	"api-siakad/app/repository"
 	"api-siakad/helper"

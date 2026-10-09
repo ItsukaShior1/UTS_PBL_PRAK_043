@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"api-siakad/app/middleware"
+	"api-siakad/middleware"
 	"api-siakad/app/model"
 	"api-siakad/app/repository"
 	"api-siakad/helper"
