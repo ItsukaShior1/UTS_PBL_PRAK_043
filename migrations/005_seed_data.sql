@@ -1,13 +1,10 @@
 -- 005_seed_data.sql
 -- Seeder: 1 admin, 20 mahasiswa, 10 mata kuliah.
 --
--- PENTING: Ganti <BCRYPT_HASH_admin123> dan <BCRYPT_HASH_pass123> di bawah ini
--- dengan hash bcrypt yang kamu generate dari password aslimu.
--- Untuk generate, lihat PANDUAN-UTS.md → Step 1 → "Generate bcrypt hash".
---
--- Contoh cara cepat generate (lihat PANDUAN):
---   cd /tmp && mkdir gen && cd gen && go mod init gen
---   (salin kode generator di PANDUAN, lalu) go run main.go
+-- Hash bcrypt sudah di-generate via genhash/main.go (terpisah dari project).
+-- Hash yang dipakai:
+--   admin123 -> $2a$10$wNOMU5.hOd0qu1SFtVwNCORDb1Rbl39DaX4h.7AY1Mf.ff6bVrxku
+--   pass123  -> $2a$10$KjsiSv/GysgEeBprWejZ/OeuskJ7OfJy3cqm76eTB.WZsAPTn3.ZS
 
 BEGIN;
 
@@ -16,7 +13,7 @@ BEGIN;
 -- ============================================================
 -- email: admin@siakad.test  |  password: admin123
 INSERT INTO users (email, password_hash, role)
-VALUES ('admin@siakad.test', '<BCRYPT_HASH_admin123>', 'admin')
+VALUES ('admin@siakad.test', '$2a$10$wNOMU5.hOd0qu1SFtVwNCORDb1Rbl39DaX4h.7AY1Mf.ff6bVrxku', 'admin')
 ON CONFLICT (email) DO NOTHING;
 
 -- ============================================================
@@ -54,7 +51,7 @@ DECLARE
     v_email TEXT;
     v_prodi TEXT;
     v_ipk NUMERIC(3,2);
-    v_hash TEXT := '<BCRYPT_HASH_pass123>';
+    v_hash TEXT := '$2a$10$KjsiSv/GysgEeBprWejZ/OeuskJ7OfJy3cqm76eTB.WZsAPTn3.ZS';
 BEGIN
     FOR i IN 1..20 LOOP
         v_nim   := '2024' || LPAD(i::TEXT, 8, '0');

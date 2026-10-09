@@ -76,7 +76,11 @@ Pastikan sudah terinstall:
 | Git | 2.x | `git --version` |
 | Postman / curl | - | untuk testing |
 
-> 💡 Kalau PostgreSQL-mu pakai **Supabase/Neon/Railway**, cukup catat connection string-nya. Step [Setup Database](#3-setup-database-postgresql) akan menyesuaikan.
+> 💡 **Kamu pakai PowerShell (Windows).** Semua command di panduan ini sudah disesuaikan:
+> - Pakai baris baru atau `;` (PowerShell **TIDAK support** `&&`).
+> - Path pakai `C:/...` (bukan `/tmp/...`).
+>
+> Kalau PostgreSQL-mu pakai **Supabase/Neon/Railway**, cukup catat connection string-nya. Step [Setup Database](#3-setup-database-postgresql) akan menyesuaikan.
 
 ---
 
@@ -99,7 +103,7 @@ CREATE DATABASE siakad_mini;
 
 File migration sudah aku isi (lihat folder `migrations/`). Jalankan berurutan:
 
-```bash
+```powershell
 cd "C:/Users/LENOVO/OneDrive/semester 5/Prak/Backend Prak/uts"
 
 psql -U postgres -d siakad_mini -f migrations/001_create_users.sql
@@ -110,59 +114,32 @@ psql -U postgres -d siakad_mini -f migrations/004_create_enrollments.sql
 
 ### 3.3. Generate bcrypt hash untuk seeder
 
-Seeder (`005_seed_data.sql`) butuh **2 hash bcrypt**:
-- `<BCRYPT_HASH_admin123>` → hash dari password `admin123` (untuk admin)
-- `<BCRYPT_HASH_pass123>` → hash dari password `pass123` (untuk semua 20 mahasiswa)
+> ✅ **Hash-nya sudah aku generate** dan placeholder di `005_seed_data.sql` sudah terisi.
+> Lokasi hash di file SQL: cari `'$2a$10$...'`. Lewati step ini kalau tidak ingin ubah password default.
 
-Buat program kecil generator:
+Folder `genhash/` di root project adalah generator sandbox. Cara pakainya (PowerShell):
 
-```bash
-mkdir -p /tmp/genhash && cd /tmp/genhash
-go mod init genhash
-```
-
-Buat file `main.go`:
-
-```go
-package main
-
-import (
-	"fmt"
-	"os"
-
-	"golang.org/x/crypto/bcrypt"
-)
-
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("usage: go run main.go <password>")
-		os.Exit(1)
-	}
-	pw := os.Args[1]
-	h, err := bcrypt.GenerateFromPassword([]byte(pw), 10)
-	if err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
-	}
-	fmt.Println(string(h))
-}
-```
-
-Generate:
-
-```bash
+```powershell
+cd "C:/Users/LENOVO/OneDrive/semester 5/Prak/Backend Prak/uts/genhash"
 go get golang.org/x/crypto/bcrypt
-go run main.go admin123   # output: $2a$10$xxxxx...
-go run main.go pass123    # output: $2a$10$yyyyy...
+go run main.go admin123
+go run main.go pass123
 ```
 
-**Copy output** lalu replace di `migrations/005_seed_data.sql`:
-- Ganti `<BCRYPT_HASH_admin123>` dengan hash dari `admin123`
-- Ganti `<BCRYPT_HASH_pass123>` dengan hash dari `pass123`
+Output (contoh):
+```
+$2a$10$wNOMU5.hOd0qu1SFtVwNCORDb1Rbl39DaX4h.7AY1Mf.ff6bVrxku   # admin123
+$2a$10$KjsiSv/GysgEeBprWejZ/OeuskJ7OfJy3cqm76eTB.WZsAPTn3.ZS   # pass123
+```
+
+Kalau kamu ganti password, replace manual di `migrations/005_seed_data.sql` (cari string `$2a$10$`).
+
+> 💡 Folder `genhash/` **tidak** di-commit ke repo utama (sudah masuk `.gitignore`).
+> Module name `genhash` berbeda dari `api-siakad` — tidak akan bentrok.
 
 ### 3.4. Jalankan seeder
 
-```bash
+```powershell
 psql -U postgres -d siakad_mini -f migrations/005_seed_data.sql
 ```
 
@@ -188,13 +165,15 @@ git commit -m "feat(db): schema SIAKAD + seeder 1 admin, 20 mhs, 10 mk"
 
 ## 4. Inisialisasi Proyek Go
 
-```bash
+> ⚠️ Pakai PowerShell, **JANGAN** pakai `&&`. Pisahkan command dengan baris baru atau `;`.
+
+```powershell
 cd "C:/Users/LENOVO/OneDrive/semester 5/Prak/Backend Prak/uts"
 
-# Inisialisasi module
+# Inisialisasi module (di root project, BUKAN di folder genhash/)
 go mod init api-siakad
 
-# Download dependencies
+# Download dependencies (jalankan satu-satu atau pisah dengan `;`)
 go get github.com/gofiber/fiber/v2
 go get github.com/jackc/pgx/v5
 go get github.com/jackc/pgx/v5/pgxpool
@@ -203,17 +182,15 @@ go get golang.org/x/crypto/bcrypt
 go get github.com/joho/godotenv
 ```
 
-Buat `.gitignore`:
+`.gitignore` sudah aku sediakan di root project (isi: `genhash/`, `.env`, `*.exe`, dll).
 
-```gitignore
-# Binaries
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-api-siakad.exe
-api-siakad
+Buat `.env` dari template:
+
+```powershell
+Copy-Item .env.example .env
+notepad .env
+# Isi DB_PASSWORD, JWT_SECRET, dll. Lalu save.
+```
 
 # Env
 .env
@@ -250,13 +227,6 @@ JWT_ACCESS_TTL_MINUTES=60
 
 LOGIN_MAX_FAILS=5
 LOGIN_LOCKOUT_MINUTES=1
-```
-
-Buat `.env` dari template dan sesuaikan dengan setting Postgres lokalmu:
-
-```bash
-cp .env.example .env
-# Edit .env: isi DB_PASSWORD, JWT_SECRET, dll.
 ```
 
 ### ✅ Commit Step 4
@@ -2276,7 +2246,8 @@ func main() {
 
 ### 12.2. Build & Run
 
-```bash
+```powershell
+cd "C:/Users/LENOVO/OneDrive/semester 5/Prak/Backend Prak/uts"
 go mod tidy
 go build ./...
 go run .
@@ -2321,11 +2292,16 @@ Response:
 ```
 
 Simpan token:
-```bash
+```powershell
 # PowerShell
-$TOKEN = ($response | ConvertFrom-Json).data.access_token
-# Git Bash / WSL
-TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login -H "Content-Type: application/json" -d '{"email":"admin@siakad.test","password":"admin123"}' | jq -r .data.access_token)
+$response = Invoke-RestMethod -Method Post -Uri http://localhost:3000/api/v1/auth/login `
+  -ContentType "application/json" `
+  -Body '{"email":"admin@siakad.test","password":"admin123"}'
+$TOKEN = $response.data.access_token
+
+# Test endpoint
+$headers = @{ Authorization = "Bearer $TOKEN" }
+Invoke-RestMethod -Uri "http://localhost:3000/api/v1/students?per_page=5" -Headers $headers
 ```
 
 ### 13.2. Endpoint penting yang harus di-test
